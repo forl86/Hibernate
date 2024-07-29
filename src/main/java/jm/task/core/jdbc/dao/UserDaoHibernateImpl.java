@@ -3,17 +3,12 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    private static long last_id;
     public UserDaoHibernateImpl() {
-        this.last_id = 0L;
     }
 
 
@@ -54,7 +49,7 @@ public class UserDaoHibernateImpl implements UserDao {
         Transaction tr1 = session.beginTransaction();
         User u = new User(name, lastName, age);
         try {
-            this.last_id = (long) session.save(u);
+            session.save(u);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,7 +64,7 @@ public class UserDaoHibernateImpl implements UserDao {
         Session session = Util.getSessionFactory().openSession();
         Transaction tx1 = session.beginTransaction();
         try {
-            User u = session.get(User.class, this.last_id);
+            User u = session.get(User.class, id);
             if (u != null) {
                 session.delete(u);
             } else {
@@ -92,10 +87,16 @@ public class UserDaoHibernateImpl implements UserDao {
         Session session = Util.getSessionFactory().openSession();
         List<User> users = (List<User>) session.createQuery("From User").list();
         Transaction tr = session.beginTransaction();
-        for(User u : users) {
-            session.delete(u);
+        try {
+            for (User u : users) {
+                session.delete(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        tr.commit();
-        session.close();
+        finally {
+            tr.commit();
+            session.close();
+        }
     }
 }
