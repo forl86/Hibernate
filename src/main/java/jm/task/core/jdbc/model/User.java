@@ -9,13 +9,13 @@ import java.io.Serializable;
 @Table
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    //@GeneratedValue(generator = "increment")
-    //@GenericGenerator(name = "increment", strategy = "increment")
-    @Column(name = "id")
+    @SequenceGenerator(name = "pet_seq",
+            sequenceName = "pet_sequence",
+            initialValue = 0, allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pet_seq")
     private Long id;
 
-    @Column(name = "`name`")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "lastName")

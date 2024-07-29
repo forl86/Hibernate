@@ -21,7 +21,7 @@ public class Util {
                 properties.setProperty("hibernate.connection.username", "admin");
                 properties.setProperty("hibernate.connection.password", "password");
                 properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
-                properties.setProperty("hbm2ddl.auto", "update");
+                properties.setProperty("hbm2ddl.auto", "create-drop");
                 properties.setProperty("show_sql", "true");
                 configuration.addAnnotatedClass(User.class);
                 StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()

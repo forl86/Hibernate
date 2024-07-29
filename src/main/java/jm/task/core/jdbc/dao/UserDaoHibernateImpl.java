@@ -11,7 +11,6 @@ import org.hibernate.cfg.Configuration;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
-    private static SessionFactory sessionFactory;
     private static long last_id;
     public UserDaoHibernateImpl() {
         this.last_id = 0L;
@@ -23,12 +22,10 @@ public class UserDaoHibernateImpl implements UserDao {
         Session session = Util.getSessionFactory().openSession();
         Transaction tr = session.beginTransaction();
         try {
-            session.createSQLQuery("CREATE TABLE User(id INTEGER NOT NULL, name VARCHAR(25), lastName VARCHAR(25), age INTEGER)")
+            session.createSQLQuery("CREATE TABLE IF NOT EXISTS User(id INTEGER NOT NULL, name VARCHAR(25), lastName VARCHAR(25), age INTEGER)")
                 .executeUpdate();
         } catch (Exception e) {
-            if (e.getMessage().compareTo("org.hibernate.exception.SQLGrammarException: could not execute statement") != 0) {
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
         finally {
             tr.commit();
@@ -41,7 +38,7 @@ public class UserDaoHibernateImpl implements UserDao {
         Session session = Util.getSessionFactory().openSession();
         Transaction tr = session.beginTransaction();
         try {
-            session.createSQLQuery("drop table User").executeUpdate();
+            session.createSQLQuery("DROP TABLE IF EXISTS User").executeUpdate();
         } catch (Exception e) {
                 e.printStackTrace();
         }
@@ -87,8 +84,7 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        List<User> users = (List<User>) Util.getSessionFactory().openSession().createQuery("From User").list();
-        return users;
+        return (List<User>) Util.getSessionFactory().openSession().createQuery("From User").list();
     }
 
     @Override
