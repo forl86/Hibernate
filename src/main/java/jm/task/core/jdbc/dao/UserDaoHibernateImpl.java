@@ -14,71 +14,59 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
+        Transaction tr = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction tr = session.beginTransaction();
-            try {
-                session.createSQLQuery("CREATE TABLE IF NOT EXISTS User(id INTEGER NOT NULL, name VARCHAR(25), lastName VARCHAR(25), age INTEGER)")
+            tr = session.beginTransaction();
+            session.createSQLQuery("CREATE TABLE IF NOT EXISTS User(id INTEGER NOT NULL, name VARCHAR(25), lastName VARCHAR(25), age INTEGER)")
                         .executeUpdate();
-                tr.commit();
-            } catch (Exception e) {
-                tr.rollback();
-                throw e;
-            }
+            tr.commit();
         } catch (Exception e) {
+            tr.rollback();
             e.printStackTrace();
         }
     }
 
     @Override
     public void dropUsersTable() {
+        Transaction tr = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction tr = session.beginTransaction();
-            try {
-                session.createSQLQuery("DROP TABLE IF EXISTS User").executeUpdate();
-                tr.commit();
-            } catch (Exception e) {
-                tr.rollback();
-                throw e;
-            }
+            tr = session.beginTransaction();
+            session.createSQLQuery("DROP TABLE IF EXISTS User").executeUpdate();
+            tr.commit();
         } catch (Exception e) {
+            tr.rollback();
             e.printStackTrace();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
+        Transaction tr1 = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction tr1 = session.beginTransaction();
+            tr1 = session.beginTransaction();
             User u = new User(name, lastName, age);
-            try {
-                session.save(u);
-                tr1.commit();
-            } catch (Exception e) {
-                tr1.rollback();
-                throw e;
-            }
+            session.save(u);
+            tr1.commit();
         } catch (Exception e) {
+            tr1.rollback();
             e.printStackTrace();
         }
     }
 
     @Override
     public void removeUserById(long id) {
+        Transaction tr1 = null;
         try (Session session = Util.getSessionFactory().openSession()) {
-            Transaction tr1 = session.beginTransaction();
-            try {
-                User u = session.get(User.class, id);
-                if (u != null) {
-                    session.delete(u);
-                    tr1.commit();
-                } else {
-                    System.out.println("session.get(id) returned null!");
-                }
-            } catch (Exception e) {
-                tr1.rollback();
-                throw e;
+            tr1 = session.beginTransaction();
+            User u = session.get(User.class, id);
+            if (u != null) {
+                session.delete(u);
+                tr1.commit();
+            } else {
+                System.out.println("session.get(id) returned null!");
             }
         } catch (Exception e) {
+            tr1.rollback();
             e.printStackTrace();
         }
     }
@@ -98,19 +86,16 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void cleanUsersTable() {
+        Transaction tr = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             List<User> users = (List<User>) session.createQuery("From User").list();
-            Transaction tr = session.beginTransaction();
-            try {
-                for (User u : users) {
-                    session.delete(u);
-                }
-                tr.commit();
-            } catch (Exception e) {
-                tr.rollback();
-                throw e;
+            tr = session.beginTransaction();
+            for (User u : users) {
+                session.delete(u);
             }
+            tr.commit();
         } catch (Exception e) {
+            tr.rollback();
             e.printStackTrace();
         }
     }
